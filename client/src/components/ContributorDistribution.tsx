@@ -35,6 +35,8 @@ export function ContributorDistribution({
 
   const [tokenDetails, setTokenDetails] = useState<any>({});
 
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+
   useEffect(() => {
     async function fetchContributors() {
       try {
@@ -82,13 +84,16 @@ export function ContributorDistribution({
       return;
     }
 
-    await distributeFunds(
+    const tx = await distributeFunds(
       _walletAddresses,
       address,
       getPercentageArray,
       totalBounty,
       tokenAddress
     );
+    if (tx?.hash) {
+      setTransactionHash(tx.hash);
+    }
   };
 
   const handleWalletAddressChange = (
@@ -135,22 +140,21 @@ export function ContributorDistribution({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Contribution Distribution</h2>
-
-          <div className="flex items-center space-x-2">
+      <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 sm:p-8 rounded-2xl shadow-lg border border-indigo-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-indigo-700 drop-shadow-lg">
+            Contribution Distribution
+          </h2>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
             <span className="text-sm text-gray-500">Total Bounty</span>
-
             <Input
               type="number"
               min="0"
               step="0.1"
               value={totalBounty}
               onChange={(e) => setTotalBounty(Number(e.target.value))}
-              className="w-24"
+              className="w-full sm:w-24 border border-indigo-100 rounded-lg"
             />
-
             <Input
               type="text"
               value={tokenAddress}
@@ -159,57 +163,54 @@ export function ContributorDistribution({
                 setTokenAddress(e.target.value);
                 if (tokenAddress) {
                   let result = await getTokenDetails(tokenAddress);
-                  console.log("Token Details", result);
                   setTokenDetails(result);
                 }
               }}
-              className="w-64"
+              className="w-full sm:w-64 border border-indigo-100 rounded-lg"
             />
           </div>
         </div>
-        <div className="p-3 flex">
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              <span className="text-md text-gray-500 font-bold">
-                Token Name
-              </span>
-              <span className="text-md text-green-500">
-                {tokenDetails?.name}
-              </span>
-              <span className="text-md text-gray-500 font-bold">
-                Token Symbol
-              </span>
-              <span className="text-md text-green-500">
-                {tokenDetails?.symbol}
-              </span>
-              <span className="text-md text-gray-500 font-bold">
-                Token Balance
-              </span>
-              <span className="text-md text-green-500">
-                {tokenDetails?.balance / 1e18}
-              </span>
-            </div>
+        <div className="p-3 flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm sm:text-md text-gray-500 font-bold">
+              Token Name
+            </span>
+            <span className="text-sm sm:text-md text-green-600 font-semibold">
+              {tokenDetails?.name}
+            </span>
+            <span className="text-sm sm:text-md text-gray-500 font-bold">
+              Token Symbol
+            </span>
+            <span className="text-sm sm:text-md text-green-600 font-semibold">
+              {tokenDetails?.symbol}
+            </span>
+            <span className="text-sm sm:text-md text-gray-500 font-bold">
+              Token Balance
+            </span>
+            <span className="text-sm sm:text-md text-green-600 font-semibold">
+              {tokenDetails?.balance / 1e6} USDC
+            </span>
           </div>
         </div>
-
-        <div className="space-y-4">
+        <div className="space-y-6 mt-6">
           {contributors.map((contributor) => (
             <div
               key={contributor.id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 bg-white rounded-xl shadow border border-indigo-100 hover:shadow-lg transition-all gap-4"
             >
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center gap-4 sm:gap-6">
                 <Image
                   src={contributor.avatarUrl}
                   alt={contributor.login}
-                  className="w-10 h-10 rounded-full"
-                  height={10}
-                  width={10}
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-indigo-100 shadow"
+                  height={48}
+                  width={48}
                 />
-
                 <div>
-                  <h3 className="font-medium">{contributor.login}</h3>
-                  <div className="text-sm text-gray-500">
+                  <h3 className="font-bold text-indigo-700 text-base sm:text-lg">
+                    {contributor.login}
+                  </h3>
+                  <div className="text-xs sm:text-sm text-gray-500">
                     {contributor.contributionPercentage}% contribution (
                     {contributor.contributions.commits} commits,{" "}
                     {contributor.contributions.pullRequests} PRs,{" "}
@@ -217,10 +218,9 @@ export function ContributorDistribution({
                   </div>
                 </div>
               </div>
-
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
                 <div className="text-right">
-                  <div className="font-medium">
+                  <div className="font-bold text-green-600 text-sm sm:text-base">
                     {(
                       (totalBounty *
                         (contributor.contributionPercentage ?? 0)) /
@@ -235,27 +235,36 @@ export function ContributorDistribution({
                   onChange={(e) =>
                     handleWalletAddressChange(contributor.id, e.target.value)
                   }
-                  className={`w-64 ${
+                  className={`w-full sm:w-64 border rounded-lg ${
                     walletAddresses[contributor.id] &&
                     !isValidAddress(walletAddresses[contributor.id])
                       ? "border-red-500"
-                      : ""
+                      : "border-indigo-100"
                   }`}
                 />
               </div>
             </div>
           ))}
         </div>
-
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex flex-col items-center gap-4">
           <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all w-full sm:w-auto"
             onClick={async () => {
               await addContributors(contributors, walletAddresses, totalBounty);
             }}
           >
             Distribute Bounty
           </button>
+          {transactionHash && (
+            <a
+              href={`https://sepolia.basescan.org/tx/${transactionHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 font-semibold underline text-sm"
+            >
+              View Transaction
+            </a>
+          )}
         </div>
       </div>
     </div>

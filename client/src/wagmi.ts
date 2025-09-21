@@ -17,13 +17,13 @@ const openCampus = {
   },
   blockExplorers: {
     default: {
-      name: "Open Campus Codex",
+      name: "Pruxel",
       url: "https://edu-chain-testnet.blockscout.com/",
     },
   },
 };
 export const config = getDefaultConfig({
-  appName: "PullPerks",
+  appName: "Pruxel",
   projectId: "d44b219387d0664165098cf0f75a4445",
   chains: [
     mainnet,

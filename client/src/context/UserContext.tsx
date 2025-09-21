@@ -88,24 +88,15 @@ const DataContextProvider: React.FC<DataContextProviderProps> = ({
     totalBounty: any,
     tokenAddress: any
   ) => {
-   
     try {
       let contract = await getContractInstance(mainContract, mainContractABI);
       let tokenContract = await getContractInstance(tokenAddress, tokenAbi);
       let allowance = await tokenContract.allowance(address, mainContract);
-      let totalAmount = ethers.utils.parseEther(totalBounty.toString());
+      let totalAmount = totalBounty * (10 ** 6);
       if (allowance < totalAmount) {
         let tx = await tokenContract.approve(mainContract, totalAmount);
         await tx.wait();
       }
-      console.log("Total amount", totalAmount);
-      console.log(
-        _walletAddresses,
-        address,
-        percentageArray,
-        totalAmount,
-        tokenAddress
-      );
       if (contract) {
         let tx = await contract.addProjectContributions(
           _walletAddresses,
@@ -115,13 +106,13 @@ const DataContextProvider: React.FC<DataContextProviderProps> = ({
           tokenAddress
         );
         await tx.wait();
+        return tx;
       }
-
-      
     } catch (error) {
       console.log("Error in distributing funds");
       console.log(error);
     }
+    return null;
   };
 
   useEffect(() => {

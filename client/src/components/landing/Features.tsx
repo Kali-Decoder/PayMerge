@@ -1,3 +1,6 @@
+"use client";
+import { motion } from "framer-motion";
+
 export function Features() {
   const features = [
     {
@@ -60,36 +63,70 @@ export function Features() {
     },
   ];
 
+  const cardVariants = {
+    initial: { opacity: 0, y: 30 },
+    animate: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.15, duration: 0.6 },
+    }),
+  };
+
   return (
-    <div id="features" className="py-12 bg-gray-50">
+    <div
+      id="features"
+      className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-16"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="lg:text-center"
+        >
           <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">
             Features
           </h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          <p className="mt-2 text-4xl leading-10 font-extrabold tracking-tight text-gray-900 sm:text-5xl">
             Better way to reward contributors
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
             Automate your hackathon prize distribution with blockchain
             technology and GitHub integration.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mt-10">
-          <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-            {features.map((feature) => (
-              <div key={feature.title} className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+        <div className="mt-12">
+          <div className="grid gap-8 md:grid-cols-3">
+            {features.map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                custom={i}
+                variants={cardVariants}
+                initial="initial"
+                animate="animate"
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 8px 32px rgba(124,77,255,0.15)",
+                }}
+                whileTap={{ scale: 0.97 }}
+                className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-8 flex flex-col items-start group border border-indigo-100"
+              >
+                <motion.div
+                  whileHover={{ rotate: 12, scale: 1.15 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 text-white shadow-lg mb-4 group-hover:scale-110 transition-transform duration-200"
+                >
                   {feature.icon}
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">
+                </motion.div>
+                <motion.p
+                  className="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-200"
+                  whileHover={{ color: "#7C4DFF" }}
+                >
                   {feature.title}
-                </p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  {feature.description}
-                </p>
-              </div>
+                </motion.p>
+                <p className="text-base text-gray-500">{feature.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
