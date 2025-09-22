@@ -1,4 +1,4 @@
-# Pruxel — Payroll by Proof of Contribution
+# Pruxel — Payroll by Proof of Contribution, Without Politics
 
 > Transparent payroll from GitHub contributions — weighted by quality, not noise.  
 > Turn PRs, reviews, issues, and tests into explainable scores and one-click payouts.
